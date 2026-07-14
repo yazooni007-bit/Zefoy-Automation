@@ -1,10 +1,25 @@
 import os
 import telebot
 from telebot import types
+from flask import Flask
+import threading
 
-# التوكن الخاص بك تم وضعه هنا مباشرة ليعمل البوت فوراً دون إعدادات معقدة
+# سيرفر ويب وهمي لتفادي إغلاق Render المجاني
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Bot is running successfully!"
+
+def run_flask():
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host='0.0.0.0', port=port)
+
+# تشغيل السيرفر الوهمي في الخلفية
+threading.Thread(target=run_flask).start()
+
+# التوكن الخاص بك
 BOT_TOKEN = "8914958228:AAHByDK9futhRaHvKG3_ZOrjYw-CT7JD-2I"
-
 bot = telebot.TeleBot(BOT_TOKEN)
 
 # قائمة ترحيبية تفاعلية بأزرار شاشة واضحة
@@ -30,7 +45,6 @@ def send_welcome(message):
 # التعامل مع الضغط على الأزرار
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
-    # مسح حالة الانتظار السابقة إن وجدت
     bot.clear_step_handler_by_chat_id(chat_id=call.message.chat.id)
     
     if call.data == "views":
